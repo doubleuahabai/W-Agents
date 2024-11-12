@@ -60,6 +60,9 @@
             <img src="Images/Menu1.jpg" alt="Menu Page 1" class="menu-page">
             <img src="Images/Menu2.jpg" alt="Menu Page 2" class="menu-page">
         </div>
+        <button id="myButton" class="agent-btn">
+            Review
+        </button>
     </main>
 
     <script type="text/javascript">
@@ -72,8 +75,19 @@
                     versionID: 'production',
                     assistant: { stylesheet: "styles.css" }
                 }).then(() => {
-                    document.getElementById('openChat').addEventListener('click', function() {
+                    document.getElementById('myButton').addEventListener('click', () => {
+                        // Open the chat widget
                         window.voiceflow.chat.open();
+
+                        // Send the 'button_clicked' event to Voiceflow
+                        window.voiceflow.chat.interact({
+                            type: 'event',
+                            payload: {
+                                event: {
+                                    name: 'submit_review' // The event name defined in your Event CMS
+                                }
+                            }
+                        });
                     });
                 });
             };
@@ -81,22 +95,14 @@
             v.type = "text/javascript"; 
             s.parentNode.insertBefore(v, s);
         })(document, 'script');
+        
+        document.getElementById('openChat').addEventListener('click', function() { window.voiceflow.chat.open(); });
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const menuIcon = document.querySelector('.menu-icon');
-            const navLinks = document.querySelector('.nav-links');
-
-            menuIcon.addEventListener('click', function() {
-                navLinks.classList.toggle('show');
-                menuIcon.classList.toggle('change');
-            });
-
-            const links = document.querySelectorAll('.nav-links a');
-            links.forEach(link => {
-                link.addEventListener('click', () => {
-                    navLinks.classList.remove('show');
-                    menuIcon.classList.remove('change');
-                });
+        const links = document.querySelectorAll('.nav-links a');
+        links.forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('show');
+                menuIcon.classList.remove('change');
             });
         });
     </script>
