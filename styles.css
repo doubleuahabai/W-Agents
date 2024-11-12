@@ -1,0 +1,400 @@
+:root {
+    --black: #000000;
+    --dark-steel: #2c3e50;
+    --dark-blue: #1a237e;
+    --dark-purple: #4a148c;
+    --dark-red: #b71c1c;
+    --dark-orange: #e65100;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(135deg, var(--black), var(--dark-steel));
+    color: #ffffff;
+    margin: 0;
+    padding: 12px;
+    line-height: 1.6;
+}
+
+.container {
+    width: 100%;          /* Use 100% width for smaller screens */
+    max-width: 1200px;   /* Maintain a maximum width for larger screens */
+    margin: auto auto;      /* Center the container */
+    padding: 20px;       /* Add consistent padding on all sides */
+    box-sizing: border-box; /* Include padding in the element's total width and height */
+}
+
+/* Optional: Add media queries for further responsiveness */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;   /* Slightly reduce padding on smaller screens */
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 10px;   /* Further reduce padding on very small screens */
+    }
+}
+
+header {
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 0 0 55px 0;
+    position: fixed;
+    width: 98%;
+    height: 80px;
+    top: 0;
+    z-index: 1000;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+    padding: 0 20px;
+}
+
+.logo {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 30px;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.nav-links {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    height: 100%;
+}
+
+.nav-links li {
+    margin: 0 15px;
+}
+
+.nav-links li a {
+    color: #ffffff;
+    text-decoration: none;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    transition: color 0.3s ease;
+    padding: 10px 0;
+    display: inline-block;
+}
+
+.nav-links li a:hover {
+    color: var(--dark-orange);
+}
+
+.menu-icon {
+    display: none;
+    cursor: pointer;
+}
+
+.bar1, .bar2, .bar3 {
+    width: 35px;
+    height: 5px;
+    background-color: #ffffff;
+    margin: 6px 0;
+    transition: 0.4s;
+}
+
+/* Hero Section */
+.hero-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 20px;
+    width: 100%;
+    max-width: 97%;
+    /* This ensures the image and text are side by side by default */
+}
+
+.scarlett-image {
+    width: 55%; /* Image takes 60% of the width */
+    padding-top: 100px;
+    height: auto;
+}
+
+.stella-image {
+    width: 55%; /* Image takes 60% of the width */
+    height: auto;
+    padding-bottom: 140px;
+}
+
+.hero-text {
+    width: 40%; /* Text takes 40% of the width */
+    padding-bottom: 120px;
+    font-size: 1.2rem;
+    text-align: justify;
+}
+
+.hero-main {
+    width: 100%; /* Description takes full width */
+    margin-top: 50px;
+    padding-top: 60px;
+    font-size: 2.1rem;
+}
+
+.hero-subtitle {
+    width: 100%; /* Description takes full width */
+    margin-top: 20px;
+    text-align: center;
+    font-size: 1.5rem;
+}
+
+.hero-description {
+    width: 100%; /* Description takes full width */
+    margin-top: 20px;
+}
+
+/* Mobile View: Stacks elements */
+@media (max-width: 768px) {
+    .hero {
+        flex-direction: column; /* Stacks image and text vertically on mobile */
+        text-align: center; /* Center-aligns the content */
+    }
+
+    .scarlett-image, .hero-text {
+        width: 100%; /* Each element takes full width on mobile */
+    }
+    .stella-image, .hero-text {
+        width: 100%; /* Each element takes full width on mobile */
+        padding-top: 110px;
+        padding-bottom: 0;
+    }
+
+    .hero-text {
+        padding-left: 0;
+        padding-top: 0;
+    }
+}
+
+
+h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 3rem;
+    margin-bottom: 20px;
+    text-shadow: 0 0 10px var(--dark-blue);
+    text-align: center;
+}
+
+.btn {
+    display: inline-block;
+    padding: 12px 24px;
+    background: linear-gradient(45deg, var(--dark-purple), var(--dark-blue));
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 5px;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    align-self: flex-start;
+}
+
+.btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.services {
+    padding: 30px 0;
+    text-align: center;
+}
+
+.service-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+}
+
+.service-card {
+    background: rgba(44, 62, 80, 0.8);
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.service-card:hover {
+    transform: translateY(-10px);
+}
+
+.service-card h3 {
+    font-family: 'Orbitron', sans-serif;
+    color: var(--dark-orange);
+}
+
+.agent-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.agent-btn {
+    padding: 12px 25px;
+    font-size: 1.05rem;
+    background: linear-gradient(45deg, var(--dark-red), var(--dark-purple));
+    border: none;
+    color: #ffffff;
+    cursor: pointer;
+    border-radius: 50px;
+    font-family: 'Orbitron', sans-serif;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.agent-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.agent-btn span {
+            display: inline-block;
+            width: 20px; /* Adjusted size for the icon */
+            height: 20px; /* Adjusted size for the icon */
+            margin-right: 10px; /* Space between icon and text */
+        }
+
+.agent-btn i {
+            font-size: 18px;
+        }
+
+/* Voiceflow chat styles */
+.voiceflow-chat {
+    background-color: var(--dark-steel);
+}
+
+.vfrc-header {
+    background-color: var(--dark-purple);
+    color: #ffffff;
+    width: 100%;
+    padding: 2px 5px;
+    text-align: center;
+}
+
+.vfrc-assistant-info--title {
+    color: #ffffff;
+}
+
+.vfrc-assistant-info--description {
+    color: #b0b0b0;
+}
+
+.vfrc-chat {
+    background-color: var(--dark-steel);
+}
+
+.vfrc-message {
+    display: inline-block;
+    padding: 5px;
+    border-radius: 8px;
+    color: #333333;
+}
+
+.vfrc-system-response .vfrc-message {
+    background-color: #ffcc99;
+}
+
+.vfrc-user-response .vfrc-message {
+    background-color: #333333;
+    color: #ffffff;
+}
+
+.vf-footer {
+    background-color: var(--dark-steel);
+}
+
+.vfrc-input {
+    background-color: var(--dark-purple);
+    border: none;
+    color: #ffffff;
+    width: 100%;
+    padding-right: 20px;
+    padding: 0;
+}
+
+.vfrc-chat-input--button {
+    background-color: #9c27b0; /* Lighter purple for a modern feel */
+    color: #ffffff;
+    border: none; /* Clean, borderless look */
+    width: 15%;
+    padding-right: 25px; /* Adequate padding for comfort, including on the right */
+    border-radius: 5px; /* Slightly rounded corners */
+    font-weight: 600;
+    font-size: 2rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effects */
+}
+
+.vfrc-chat-input--button:hover {
+    background-color: #7b1fa2; /* Darker shade on hover */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Soft shadow for hover effect */
+}
+
+.vfrc-footer--watermark {
+    color: #b0b0b0;
+}
+
+.vfrc-avatar,
+.vfrc-icon {
+    border-color: var(--dark-purple);
+}
+
+footer {
+    background-color: rgba(0, 0, 0, 0.8);
+    text-align: center;
+    padding: 20px 0;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}
+
+@media screen and (max-width: 768px) {
+    .nav-links {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 80px;
+        left: 0;
+        right: 0;
+        background-color: rgba(0, 0, 0, 0.9);
+        padding: 20px;
+    }
+
+    .nav-links.show {
+        display: flex;
+    }
+
+    .nav-links li {
+        margin: 10px 0;
+    }
+
+    .menu-icon {
+        display: block;
+    }
+
+    .menu-icon.change .bar1 {
+        transform: rotate(-45deg) translate(-9px, 6px);
+    }
+
+    .menu-icon.change .bar2 {
+        opacity: 0;
+    }
+
+    .menu-icon.change .bar3 {
+        transform: rotate(45deg) translate(-8px, -8px);
+    }
+}
