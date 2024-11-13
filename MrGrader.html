@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OctoPlex AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+   <header>
+        <div class="container">
+            <nav>
+                <div class="logo">OctoPlex AI</div>
+                <div class="menu-icon">
+                    <div class="bar1"></div>
+                    <div class="bar2"></div>
+                    <div class="bar3"></div>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="index.html">Chatbots</a></li>
+                    <li><a href="index.html">Voice Agents</a></li>
+                    <li><a href="index.html">Automations</a></li>
+                    <li><a href="index.html">FAQs</a></li>
+                    <li><a href="index.html">About Us</a></li>
+                    <li><a href="index.html">Contact</a></li>
+                </ul>
+            </nav>
+                <div class="agent-buttons">
+                  <button id="openChat" class="agent-btn" aria-label="Chat with Margaret">
+                    <span id="icon-chat"></span>
+                    Coming Soon!
+                  </button>
+                </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero-container"> 
+            <div class="hero">
+                <img src="Images/Mr.%20Jones.jpg" alt="Scarlett" class="scarlett-image"> 
+                <div class="hero-text">
+                    <h1>Meet<br>Johnson Grader<br>- Application Tracking Agent</h1> 
+                    <p class="hero-description">
+                        Mr. Grader is your dedicated application tracking agent, working tirelessly around the clock to streamline your operations. From keeping you updated on application statuses to managing follow-ups and ensuring smooth progress, Mr. Grader is here to help you stay organized and on top of every step in the process. 
+                    </p>
+                    <a href="#services" class="btn">Explore Our Services</a>
+                </div>
+            </div>
+        </section>
+        <section id="services" class="services">
+            <div class="container">
+                <h2>Our Services</h2>
+                <div class="service-grid">
+                    <div class="service-card">
+                        <h3>OctoPlex AI Chatbots</h3>
+                        <p>Advanced conversational AI for enhanced customer engagement.</p>
+                    </div>
+                    <div class="service-card">
+                        <h3>Voice Agents</h3>
+                        <p>Intelligent voice-based solutions for seamless interactions.</p>
+                    </div>
+                    <div class="service-card">
+                        <h3>AI-Powered Automations</h3>
+                        <p>Streamline your workflows with smart AI-powered automations.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 OctoPlex AI. All rights reserved.</p>
+        </div>
+    </footer>
+    <script type="module">
+        window.addEventListener('load', function() {
+            const FileUploadExtension = {
+                name: 'FileUpload',
+                type: 'response',
+                match: ({ trace }) => trace.type === 'ext_fileUpload' || trace.payload.name === 'ext_fileUpload',
+                render: ({ trace, element }) => {
+                    // Create a container for the file upload
+                    const fileUploadContainer = document.createElement('div');
+                    fileUploadContainer.innerHTML = `
+                        <style>
+                            .my-file-upload {
+                                border: 2px dashed rgba(46, 110, 225, 0.3);
+                                padding: 20px;
+                                text-align: center;
+                                cursor: pointer;
+                                transition: background-color 0.2s ease;
+                            }
+                            .my-file-upload:hover {
+                                background-color: rgba(46, 110, 225, 0.1);
+                            }
+                        </style>
+                        <div class='my-file-upload'>
+                            Drag and drop a file here or click to upload
+                        </div>
+                        <input type='file' style='display: none;'>
+                    `;
+
+                    const fileInput = fileUploadContainer.querySelector('input[type="file"]');
+                    const fileUploadBox = fileUploadContainer.querySelector('.my-file-upload');
+
+                    // Open file selector when box is clicked
+                    fileUploadBox.addEventListener('click', () => fileInput.click());
+
+                    // Handle file selection and upload
+                    fileInput.addEventListener('change', async function () {
+                        const file = this.files[0];
+
+                        if (file) {
+                            fileUploadContainer.innerHTML = `<div>Uploading ${file.name}...</div>`;
+
+                            try {
+                                const formData = new FormData();
+                                formData.append('file', file);
+
+                                const response = await fetch('https://tmpfiles.org/api/v1/upload', {
+                                    method: 'POST',
+                                    body: formData,
+                                });
+
+                                const result = await response.json();
+
+                                if (response.ok && result.data?.url) {
+                                    const fileUrl = result.data.url.replace('https://tmpfiles.org/', 'https://tmpfiles.org/dl/');
+                                    fileUploadContainer.innerHTML = `<div>File uploaded: ${file.name}</div>`;
+
+                                    // Notify the Voiceflow chat about the uploaded file
+                                    window.voiceflow.chat.interact({
+                                        type: 'complete',
+                                        payload: { file: fileUrl },
+                                    });
+                                } else {
+                                    throw new Error('Failed to upload file');
+                                }
+                            } catch (error) {
+                                console.error('Upload Error:', error);
+                                fileUploadContainer.innerHTML = '<div>Error during upload. Please try again.</div>';
+                            }
+                        }
+                    });
+
+                    // Append file upload container to the element
+                    element.appendChild(fileUploadContainer);
+                },
+            };
+
+            // Toggle dropdown content visibility
+            function toggleDropdown() {
+                var content = document.getElementById('coreRolesContent');
+                content.style.display = (content.style.display === 'block') ? 'none' : 'block';
+            }
+
+            // Load the Voiceflow chat widget
+            (function(d, t) {
+                var v = d.createElement(t),
+                    s = d.getElementsByTagName(t)[0];
+
+                v.onload = function() {
+                    window.voiceflow.chat.load({
+                        verify: { projectID: '6733e1e3d51baff545817013' }, // Ensure the project ID is correct
+                        url: 'https://general-runtime.voiceflow.com',
+                        versionID: 'production',
+                        assistant: {
+                            extensions: [FileUploadExtension],
+                        },
+                    }).then(() => {
+                        // Add event listener to open the chat widget
+                        document.getElementById('openChat').addEventListener('click', function() {
+                            window.voiceflow.chat.open();
+                        });
+                    });
+                };
+
+                v.src = 'https://cdn.voiceflow.com/widget/bundle.mjs';
+                v.type = 'text/javascript';
+                s.parentNode.insertBefore(v, s);
+            })(document, 'script');
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuIcon = document.querySelector('.menu-icon');
+            const navLinks = document.querySelector('.nav-links');
+
+            menuIcon.addEventListener('click', function() {
+                navLinks.classList.toggle('show');
+                menuIcon.classList.toggle('change');
+            });
+
+            // Close menu when a link is clicked
+            const links = document.querySelectorAll('.nav-links a');
+            links.forEach(link => {
+                link.addEventListener('click', () => {
+                    navLinks.classList.remove('show');
+                    menuIcon.classList.remove('change');
+                });
+            });
+        });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.11/lottie.min.js"></script>
+    <script>
+      // Load the first Lottie animation for the "Call Scarlett" button
+      fetch('Icon/lottieflow-voice.json')
+        .then(response => response.json())
+        .then(data => {
+          lottie.loadAnimation({
+            container: document.getElementById('icon-call'), // Target container for this animation
+            renderer: 'svg', // Choose svg, canvas, or html
+            loop: true,
+            autoplay: true,
+            animationData: data
+          });
+        });
+
+      // Load the second Lottie animation for the "Chat with Scarlett" button
+      fetch('Icon/lottieflow-chat.json')
+        .then(response => response.json())
+        .then(data => {
+          lottie.loadAnimation({
+            container: document.getElementById('icon-chat'), // Target container for this animation
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            animationData: data
+          });
+        });
+    </script>
+</body>
+</html>
