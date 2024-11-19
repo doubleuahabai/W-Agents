@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OctoPlex AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+   <header>
+        <div class="container">
+            <nav>
+                <div class="logo">OctoPlex AI</div>
+                <div class="menu-icon">
+                    <div class="bar1"></div>
+                    <div class="bar2"></div>
+                    <div class="bar3"></div>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="index.html">Chatbots</a></li>
+                    <li><a href="index.html">Voice Agents</a></li>
+                    <li><a href="index.html">Automations</a></li>
+                    <li><a href="index.html">FAQs</a></li>
+                    <li><a href="index.html">About Us</a></li>
+                    <li><a href="index.html">Contact</a></li>
+                </ul>
+            </nav>
+                <div class="agent-buttons">
+                  <button id="call-scarlett" class="agent-btn">
+                    <span id="icon-call"></span>
+                    Phone Agent Coming Soon!
+                  </button>
+
+                  <button id="openChat" class="agent-btn" aria-label="Chat with Margaret">
+                    <span id="icon-chat"></span>
+                    Chat with Scarlett
+                  </button>
+                </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero-container"> 
+            <div class="hero">
+                <img src="Images/scarlettt.jpg" alt="Scarlett" class="scarlett-image"> 
+                <div class="hero-text">
+                    <h1 class="hero-main">Meet<br>Scarlett Booker<br>- Extraordinaire -<br>24/7 Brand Advocate</h1> 
+                    <p class="hero-subtitle">Bespoke Sales Agent | Booking Concierge<br>Brand Advocate | Knowledge Base Aficionado<br><br></p>
+                    <p class="hero-description">
+                        Scarlett is your tireless assistant, dedicated to enhancing your business operations around the clock. From advocating for your brand, to managing bookings and providing tailored sales support, Scarlett is here to make your business thrive.<br><br><br> 
+                    </p>
+                    <a href="#services" class="btn">Explore Our Services</a>
+                </div>
+            </div>
+        </section>
+        <section id="services" class="services">
+            <div class="container">
+                <h2>Our Services</h2>
+                <div class="service-grid">
+                    <div class="service-card">
+                        <h3>OctoPlex AI Chatbots</h3>
+                        <p>Advanced conversational AI for enhanced customer engagement.</p>
+                    </div>
+                    <div class="service-card">
+                        <h3>Voice Agents</h3>
+                        <p>Intelligent voice-based solutions for seamless interactions.</p>
+                    </div>
+                    <div class="service-card">
+                        <h3>AI-Powered Automations</h3>
+                        <p>Streamline your workflows with smart AI-powered automations.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 OctoPlex AI. All rights reserved.</p>
+        </div>
+    </footer>
+    <script type="text/javascript">
+        // Function to toggle dropdown content visibility
+        function toggleDropdown() {
+            var content = document.getElementById('coreRolesContent');
+            content.style.display = (content.style.display === 'block') ? 'none' : 'block';
+        }
+
+        // Voiceflow chat widget loading script
+        (function(d, t) {
+            var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
+            v.onload = function() {
+                window.voiceflow.chat.load({
+                    verify: { projectID: '673c6fc2f98e49f3930cc167' }, // Ensure the project ID is correct
+                    url: 'https://general-runtime.voiceflow.com',
+                    versionID: 'production',
+                    assistant: { stylesheet: "styles.css" }
+                }).then(() => {
+                    // Add event listener to open the chat widget when clicking the button
+                    document.getElementById('openChat').addEventListener('click', function() {
+                        window.voiceflow.chat.open();
+                    });
+                });
+            };
+            v.src = "https://cdn.voiceflow.com/widget/bundle.mjs"; 
+            v.type = "text/javascript"; 
+            s.parentNode.insertBefore(v, s);
+        })(document, 'script');
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuIcon = document.querySelector('.menu-icon');
+            const navLinks = document.querySelector('.nav-links');
+
+            menuIcon.addEventListener('click', function() {
+                navLinks.classList.toggle('show');
+                menuIcon.classList.toggle('change');
+            });
+
+            // Close menu when a link is clicked
+            const links = document.querySelectorAll('.nav-links a');
+            links.forEach(link => {
+                link.addEventListener('click', () => {
+                    navLinks.classList.remove('show');
+                    menuIcon.classList.remove('change');
+                });
+            });
+        });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.11/lottie.min.js"></script>
+    <script>
+      // Load the first Lottie animation for the "Call Scarlett" button
+      fetch('Icon/lottieflow-voice.json')
+        .then(response => response.json())
+        .then(data => {
+          lottie.loadAnimation({
+            container: document.getElementById('icon-call'), // Target container for this animation
+            renderer: 'svg', // Choose svg, canvas, or html
+            loop: true,
+            autoplay: true,
+            animationData: data
+          });
+        });
+
+      // Load the second Lottie animation for the "Chat with Scarlett" button
+      fetch('Icon/lottieflow-chat.json')
+        .then(response => response.json())
+        .then(data => {
+          lottie.loadAnimation({
+            container: document.getElementById('icon-chat'), // Target container for this animation
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            animationData: data
+          });
+        });
+    </script>
+</body>
+</html>
