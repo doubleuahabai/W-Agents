@@ -1,106 +1,120 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Gregg's Grill Menu</title>
-        <link
-            href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Orbitron:wght@400;700&display=swap"
-            rel="stylesheet" />
-        <link rel="stylesheet" href="styles.css" />
-        <style>
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }
 
-            .menu-container {
-                margin-top: 80px;
-                padding: 2rem 0;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 2rem;
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gregg's Grill Menu</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Orbitron:wght@400;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .menu-container {
+            margin-top: 80px;
+            padding: 2rem 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .menu-page {
+            width: 100%;
+            max-width: 800px;
+            height: auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .menu-page:hover {
+            transform: scale(1.02);
+        }
+
+        @media (max-width: 768px) {
+            .menu-icon {
+                display: block;
             }
 
             .menu-page {
-                width: 100%;
-                max-width: 800px;
-                height: auto;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                transition: transform 0.3s ease;
+                width: 95%;
             }
+        }
+    </style>
+</head>
 
-            .menu-page:hover {
-                transform: scale(1.02);
-            }
-
-            @media (max-width: 768px) {
-                .menu-icon {
-                    display: block;
-                }
-                .menu-page {
-                    width: 95%;
-                }
-            }
-        </style>
-    </head>
-    <body>
-        <header>
-            <div class="container">
-                <div class="agent-buttons">
-                    <button id="openChat" class="agent-btn">Place Order</button>
-                </div>
+<body>
+    <header>
+        <div class="container">
+            <div class="agent-buttons">
+                <button id="openChat" class="agent-btn">Place Order</button>
             </div>
-        </header>
+        </div>
+    </header>
 
-        <main>
-            <div class="menu-container" id="menu">
-                <img src="Images/Menu1.jpg" alt="Menu Page 1" class="menu-page" />
-                <img src="Images/Menu2.jpg" alt="Menu Page 2" class="menu-page" />
-            </div>
-            <button id="myButton" class="agent-btn">Review</button>
-        </main>
+    <main>
+        <div class="menu-container" id="menu">
+            <img src="Images/Menu1.jpg" alt="Menu Page 1" class="menu-page" />
+            <img src="Images/Menu2.jpg" alt="Menu Page 2" class="menu-page" />
+        </div>
+        <button id="myButton" class="agent-btn">Review</button>
+    </main>
 
-        <script type="text/javascript">
-            (function (d, t) {
-                var v = d.createElement(t),
-                    s = d.getElementsByTagName(t)[0];
-                v.onload = function () {
-                    window.voiceflow.chat.load({
-                        verify: { projectID: "6740cfed75a71c1288696aa4" },
-                        url: "https://general-runtime.voiceflow.com",
-                        versionID: "production",
-                        launch: {
-                            event: {
-                                type: "launch",
-                                payload: {
-                                    user_id: userId // Pass the extracted or overridden userId here
-                                }
+    <script type="text/javascript">
+        (function (d, t) {
+            var v = d.createElement(t),
+                s = d.getElementsByTagName(t)[0];
+            v.onload = function () {
+                // Initialize chat with the updated userId
+                window.voiceflow.chat.load({
+                    verify: { projectID: "6740cfed75a71c1288696aa4" },
+                    url: "https://general-runtime.voiceflow.com",
+                    versionID: "production",
+                    launch: {
+                        event: {
+                            type: "launch",
+                            payload: {
+                                user_id: window.userId || "undefined" // Use the updated userId
                             }
                         }
-                    });
-                };
-                v.src = "https://cdn.voiceflow.com/widget/bundle.mjs";
-                v.type = "text/javascript";
-                s.parentNode.insertBefore(v, s);
-
-                // Extract 'userId' from the URL query parameter
-                const urlParams = new URLSearchParams(window.location.search);
-                let userId = urlParams.get("userId") === "adminManagement" ? userID : "undefined";
-
-                // Event listener for 'Place Order' button
-                document.getElementById("openChat").addEventListener("click", function () {
-                    window.voiceflow.chat.open();
+                    }
                 });
+            };
+            v.src = "https://cdn.voiceflow.com/widget/bundle.mjs";
+            v.type = "text/javascript";
+            s.parentNode.insertBefore(v, s);
 
-                // Event listener for 'Review' button
-                document.getElementById("myButton").addEventListener("click", function () {
-                    userId = "submit_review"; // Override userId for 'Review'
-                    window.voiceflow.chat.open(); // Open chat immediately with the updated userId
-                });
-            })(document, "script");
-        </script>
-    </body>
+            // Extract 'userId' from the URL query parameter if present
+            const urlParams = new URLSearchParams(window.location.search);
+            let initialUserId = urlParams.has("userId") ? urlParams.get("userId") : null;
+            window.userId = initialUserId; // Set userId to the URL parameter (if any)
+
+            // Check if the userId exists and output the result
+            if (window.userId) {
+                console.log("Initial User ID: " + window.userId); // Log userId if it exists
+            } else {
+                console.log("No userId found in URL"); // Optionally log when there's no userId
+            }
+
+            // Event listener for 'Place Order' button
+            document.getElementById("openChat").addEventListener("click", function () {
+                window.voiceflow.chat.open();
+            });
+
+            // Event listener for 'Review' button
+            document.getElementById("myButton").addEventListener("click", function () {
+                // Override userId for 'Review' button click
+                window.userId = "submit_review";
+                console.log("User ID changed to: " + window.userId); // Log the updated userId
+                window.voiceflow.chat.open(); // Open chat immediately with the updated userId
+            });
+        })(document, "script");
+    </script>
+</body>
+
 </html>
