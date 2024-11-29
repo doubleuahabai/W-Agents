@@ -67,13 +67,22 @@
 
     <script type="text/javascript">
         (function(d, t) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('userId');
             var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
             v.onload = function() {
                 window.voiceflow.chat.load({
                     verify: { projectID: '6740cfed75a71c1288696aa4' },
                     url: 'https://general-runtime.voiceflow.com',
                     versionID: 'production',
-                    assistant: { stylesheet: "styles.css" }
+                    launch: {
+                      event: {
+                        type: "launch",
+                        payload: {
+                          user_id: userId // Pass the extracted userId here
+                        }
+                      }
+                    }
                 }).then(() => {
                     document.getElementById('myButton').addEventListener('click', () => {
                         // Open the chat widget
