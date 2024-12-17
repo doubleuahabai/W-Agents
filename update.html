@@ -12,12 +12,38 @@
             margin: 0;
             padding: 0;
             font-family: 'Arial', sans-serif;
-            background-color: #121212;
+            background-color: #638b5f; /* Greenish Background */
             display: flex;
             align-items: center;
             justify-content: center;
             height: 100vh;
             overflow: hidden;
+            position: relative;
+        }
+
+        /* Background Spherical Logo (Earth-like Rotation) */
+        .logo-background {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 400px;
+            height: 400px;
+            background-image: url('https://cm4-production-assets.s3.amazonaws.com/1733995620474-logo-no-background.png');
+            background-size: cover;
+            background-position: center;
+            border-radius: 50%;
+            animation: rotateLogo 30s infinite linear; /* Rotational movement like Earth */
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 80px rgba(99, 139, 95, 0.3);
+        }
+
+        @keyframes rotateLogo {
+            0% {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+            100% {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
         }
 
         /* Full-screen Message Container */
@@ -66,16 +92,16 @@
             width: 120px;
             height: 120px;
             border-radius: 50%;
-            border: 4px solid #007bff;
+            border: 4px solid #e4a853; /* Gold accent */
             background-color: #1e1e2e;
-            box-shadow: 0 0 15px rgba(0, 123, 255, 0.7);
+            box-shadow: 0 0 15px rgba(228, 168, 83, 0.7); /* Gold shadow */
         }
 
         /* Name */
         .name {
             font-size: 1.5rem;
             font-weight: bold;
-            color: #007bff;
+            color: #e4a853; /* Gold accent */
             letter-spacing: 1px;
         }
 
@@ -119,9 +145,13 @@
             0%, 100% { opacity: 0.4; }
             50% { opacity: 1; }
         }
+
     </style>
 </head>
 <body>
+    <!-- Background Logo Animation (Earth-like) -->
+    <div class="logo-background"></div>
+
     <!-- Loading State -->
     <div id="loading" class="loading">
         <i class="fas fa-spinner fa-spin"></i> Fetching message from Mylo...
@@ -133,7 +163,7 @@
             <div class="close-btn" onclick="hidePopup()">✖</div>
             <img src="https://cm4-production-assets.s3.amazonaws.com/1733064359253-stella-removebg-preview-1.png" alt="Mylo" class="avatar">
             <div class="name">Mylo</div>
-            <div class="message" id="message-content">Updating...</div>
+            <div class="message" id="message-content">Placeholder message...</div>
         </div>
     </div>
 
