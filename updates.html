@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agent Management - Mylo</title>
-    <!-- Font Awesome for Icons -->
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <style>
         body {
             margin: 0;
@@ -70,14 +68,12 @@
             background: #3a3a66;
             color: #fff;
             align-self: flex-start;
-            animation: fadeInLeft 0.3s;
         }
 
         .message.user {
             background: #e4a853;
             color: #fff;
             align-self: flex-end;
-            animation: fadeInRight 0.3s;
         }
 
         .buttons-container {
@@ -163,7 +159,18 @@
                         'Content-Type': 'application/json',
                         'accept': 'application/json',
                     },
-                    body: JSON.stringify({ request: payload, customerId }),
+                    body: JSON.stringify({
+                        launch: {
+                            event: {
+                                type: "launch",
+                                payload: {
+                                    user_name: "Manager",
+                                    user_intent: "management",
+                                    customerId: customerId // Include customerId in payload
+                                }
+                            }
+                        }
+                    }),
                 });
 
                 const traces = await response.json();
@@ -197,11 +204,9 @@
 
         // Display buttons
         function displayButtons(buttonsList) {
-            // Clear any existing buttons
             const existingButtons = document.querySelector('.buttons-container');
             if (existingButtons) existingButtons.remove();
 
-            // Create a new container for the buttons
             const buttonsContainer = document.createElement('div');
             buttonsContainer.className = 'buttons-container';
 
@@ -210,7 +215,6 @@
                 btn.className = 'chat-button';
                 btn.textContent = button.name;
                 btn.onclick = () => {
-                    // Interact with the button and remove the buttons container
                     interactWithVoiceflow(button.request);
                     buttonsContainer.remove();
                 };
@@ -226,14 +230,22 @@
             const message = userInput.value.trim();
             if (message) {
                 displayMessage(message, 'user');
-                interactWithVoiceflow({ type: 'text', payload: message });
+                interactWithVoiceflow({
+                    type: 'text',
+                    payload: message,
+                });
                 userInput.value = '';
             }
         }
 
         // Initialize the conversation
         window.onload = () => {
-            interactWithVoiceflow({ type: 'launch' });
+            interactWithVoiceflow({
+                type: 'launch',
+                payload: {
+                    user_intent: 'Update',
+                },
+            });
         };
     </script>
 </body>
