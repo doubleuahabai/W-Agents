@@ -197,7 +197,9 @@
                         request: {
                             type: 'launch',
                             payload: {
-                                id: 'Update' // Structured input
+                                id: "Management",
+                                adminId: adminId || "undefined", // Use adminId if available
+                                ...requestPayload // Spread additional request payload, if any
                             }
                         }
                     }),
