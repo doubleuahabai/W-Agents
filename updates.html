@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Management - Mylo</title>
+    <!-- Font Awesome for Icons -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #638b5f, #e4a853);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .chat-container {
+            width: 450px;
+            height: 700px;
+            background: #2e2e4f;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: #3a3a66;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .agent-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: url('https://cm4-production-assets.s3.amazonaws.com/1733064359253-stella-removebg-preview-1.png') no-repeat center/cover;
+            border: 3px solid #e4a853;
+        }
+
+        .agent-name {
+            color: #e4a853;
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background: #1e1e2e;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            max-width: 80%;
+        }
+
+        .message.agent {
+            background: #3a3a66;
+            color: #fff;
+            align-self: flex-start;
+            animation: fadeInLeft 0.3s;
+        }
+
+        .message.user {
+            background: #e4a853;
+            color: #fff;
+            align-self: flex-end;
+            animation: fadeInRight 0.3s;
+        }
+
+        .buttons-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .chat-button {
+            background: #638b5f;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .chat-button:hover {
+            background: #e4a853;
+        }
+
+        .chat-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #3a3a66;
+            padding: 10px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            background: #2e2e4f;
+            color: #fff;
+        }
+
+        .chat-input button {
+            background: #e4a853;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="agent-avatar"></div>
+            <div class="agent-name">Mylo</div>
+        </div>
+        <div class="chat-messages" id="chat-messages"></div>
+        <div class="chat-input">
+            <input type="text" id="user-input" placeholder="Type your message here...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        const apiKey = 'VF.DM.6758c6fb968873b627e0b5db.Cc5NcWBtBhx987kx'; // Replace with your Voiceflow API Key
+        const userId = 'user_management'; // Replace with your user ID
+        const chatMessages = document.getElementById('chat-messages');
+        const userInput = document.getElementById('user-input');
+
+        let buttons = [];
+
+        // Extract the customerId from the URL search parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const customerId = urlParams.get('customerId') || 'default';
+
+        // Function to interact with Voiceflow
+        async function interactWithVoiceflow(payload) {
+            try {
+                const response = await fetch(`https://general-runtime.voiceflow.com/state/user/${userId}/interact`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': apiKey,
+                        'Content-Type': 'application/json',
+                        'accept': 'application/json',
+                    },
+                    body: JSON.stringify({ request: payload, customerId }),
+                });
+
+                const traces = await response.json();
+                handleTraces(traces);
+            } catch (error) {
+                console.error('Error interacting with Voiceflow:', error);
+            }
+        }
+
+        // Handle traces from Voiceflow
+        function handleTraces(traces) {
+            traces.forEach(trace => {
+                if (trace.type === 'text') {
+                    displayMessage(trace.payload.message, 'agent');
+                } else if (trace.type === 'choice') {
+                    displayButtons(trace.payload.buttons);
+                } else if (trace.type === 'end') {
+                    displayMessage('The conversation has ended.', 'agent');
+                }
+            });
+        }
+
+        // Display messages
+        function displayMessage(message, sender) {
+            const msgElement = document.createElement('div');
+            msgElement.className = `message ${sender}`;
+            msgElement.textContent = message;
+            chatMessages.appendChild(msgElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight; // Auto-scroll
+        }
+
+        // Display buttons
+        function displayButtons(buttonsList) {
+            // Clear any existing buttons
+            const existingButtons = document.querySelector('.buttons-container');
+            if (existingButtons) existingButtons.remove();
+
+            // Create a new container for the buttons
+            const buttonsContainer = document.createElement('div');
+            buttonsContainer.className = 'buttons-container';
+
+            buttonsList.forEach(button => {
+                const btn = document.createElement('button');
+                btn.className = 'chat-button';
+                btn.textContent = button.name;
+                btn.onclick = () => {
+                    // Interact with the button and remove the buttons container
+                    interactWithVoiceflow(button.request);
+                    buttonsContainer.remove();
+                };
+                buttonsContainer.appendChild(btn);
+            });
+
+            chatMessages.appendChild(buttonsContainer);
+            chatMessages.scrollTop = chatMessages.scrollHeight; // Auto-scroll
+        }
+
+        // Send a message
+        function sendMessage() {
+            const message = userInput.value.trim();
+            if (message) {
+                displayMessage(message, 'user');
+                interactWithVoiceflow({ type: 'text', payload: message });
+                userInput.value = '';
+            }
+        }
+
+        // Initialize the conversation
+        window.onload = () => {
+            interactWithVoiceflow({ type: 'launch' });
+        };
+    </script>
+</body>
+</html>
