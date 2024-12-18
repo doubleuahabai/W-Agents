@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agent Management - Mylo</title>
     <style>
+        /* General Body Styling */
         body {
             margin: 0;
             padding: 0;
@@ -17,6 +18,7 @@
             overflow: hidden;
         }
 
+        /* Chat Container Styling */
         .chat-container {
             width: 450px;
             height: 700px;
@@ -28,6 +30,7 @@
             overflow: hidden;
         }
 
+        /* Chat Header Styling */
         .chat-header {
             background: #3a3a66;
             padding: 20px;
@@ -50,6 +53,7 @@
             font-weight: bold;
         }
 
+        /* Chat Messages Styling */
         .chat-messages {
             flex: 1;
             padding: 15px;
@@ -76,6 +80,7 @@
             align-self: flex-end;
         }
 
+        /* Buttons Styling */
         .buttons-container {
             display: flex;
             flex-wrap: wrap;
@@ -97,6 +102,7 @@
             background: #e4a853;
         }
 
+        /* Chat Input Styling */
         .chat-input {
             display: flex;
             align-items: center;
@@ -138,19 +144,23 @@
     </div>
 
     <script>
+        // Voiceflow API Setup
         const apiKey = 'VF.DM.6758c6fb968873b627e0b5db.Cc5NcWBtBhx987kx'; // Replace with your Voiceflow API Key
-        const userId = 'user_management'; // Replace with your user ID
+        let userId = 'user_management'; // Default User ID
         const chatMessages = document.getElementById('chat-messages');
         const userInput = document.getElementById('user-input');
 
-        let buttons = [];
-
-        // Extract the customerId from the URL search parameters
+        // Extract 'adminId' from URL Query Parameters
         const urlParams = new URLSearchParams(window.location.search);
-        const customerId = urlParams.get('customerId') || 'default';
+        const adminId = urlParams.get('adminId') || null;
 
-        // Function to interact with Voiceflow
-        async function interactWithVoiceflow(payload) {
+        // Update userId based on adminId
+        if (adminId) {
+            userId = adminId;
+        }
+
+        // Interact with Voiceflow API
+        async function interactWithVoiceflow(requestPayload = null) {
             try {
                 const response = await fetch(`https://general-runtime.voiceflow.com/state/user/${userId}/interact`, {
                     method: 'POST',
@@ -160,14 +170,12 @@
                         'accept': 'application/json',
                     },
                     body: JSON.stringify({
-                        launch: {
-                            event: {
-                                type: "launch",
-                                payload: {
-                                    user_name: "Manager",
-                                    user_intent: "management",
-                                    customerId: customerId // Include customerId in payload
-                                }
+                        request: {
+                            type: 'launch',
+                            payload: {
+                                id: "Management",
+                                adminId: adminId || "undefined", // Use adminId if available
+                                ...requestPayload // Spread additional request payload, if any
                             }
                         }
                     }),
@@ -180,7 +188,7 @@
             }
         }
 
-        // Handle traces from Voiceflow
+        // Handle Voiceflow Traces
         function handleTraces(traces) {
             traces.forEach(trace => {
                 if (trace.type === 'text') {
@@ -193,7 +201,7 @@
             });
         }
 
-        // Display messages
+        // Display Messages in Chat
         function displayMessage(message, sender) {
             const msgElement = document.createElement('div');
             msgElement.className = `message ${sender}`;
@@ -202,21 +210,24 @@
             chatMessages.scrollTop = chatMessages.scrollHeight; // Auto-scroll
         }
 
-        // Display buttons
+        // Display Buttons
         function displayButtons(buttonsList) {
+            // Remove any previously displayed buttons
             const existingButtons = document.querySelector('.buttons-container');
             if (existingButtons) existingButtons.remove();
 
             const buttonsContainer = document.createElement('div');
             buttonsContainer.className = 'buttons-container';
 
+            // Create buttons from the provided list
             buttonsList.forEach(button => {
                 const btn = document.createElement('button');
                 btn.className = 'chat-button';
                 btn.textContent = button.name;
-                btn.onclick = () => {
-                    interactWithVoiceflow(button.request);
-                    buttonsContainer.remove();
+                btn.onclick = async () => {
+                    // Handle the button click, send the corresponding request, and hide buttons
+                    await interactWithVoiceflow(button.request);
+                    buttonsContainer.remove(); // Remove buttons after one is clicked
                 };
                 buttonsContainer.appendChild(btn);
             });
@@ -225,7 +236,7 @@
             chatMessages.scrollTop = chatMessages.scrollHeight; // Auto-scroll
         }
 
-        // Send a message
+        // Send User Message
         function sendMessage() {
             const message = userInput.value.trim();
             if (message) {
@@ -238,7 +249,7 @@
             }
         }
 
-        // Initialize the conversation
+        // Initialize the Chat on Page Load
         window.onload = () => {
             interactWithVoiceflow({
                 type: 'launch',
