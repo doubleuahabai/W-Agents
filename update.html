@@ -149,7 +149,7 @@
     </style>
 </head>
 <body>
-    <!-- Background Logo Animation (Earth-like Rotation) -->
+    <!-- Background Logo Animation (Earth-like) -->
     <div class="logo-background"></div>
 
     <!-- Loading State -->
@@ -175,10 +175,6 @@
         const popupContainer = document.getElementById('popup-container');
         const messageContent = document.getElementById('message-content');
 
-        // Extract customerId from URL search parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        const customerId = urlParams.get('customerId') || 'unknown_customer';
-
         // Function to interact with Voiceflow
         async function interactWithVoiceflow() {
             try {
@@ -193,8 +189,7 @@
                         request: {
                             type: 'launch',
                             payload: {
-                                user_intent: 'Update',
-                                customerId: customerId // Include customerId in payload
+                                user_intent: 'Update' // Structured input
                             }
                         }
                     }),
