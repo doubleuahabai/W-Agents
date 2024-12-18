@@ -175,6 +175,14 @@
         const popupContainer = document.getElementById('popup-container');
         const messageContent = document.getElementById('message-content');
 
+        const urlParams = new URLSearchParams(window.location.search);
+        const adminId = urlParams.get('adminId') || null;
+
+        // Update userId based on adminId
+        if (adminId) {
+            userId = adminId;
+        }
+
         // Function to interact with Voiceflow
         async function interactWithVoiceflow() {
             try {
