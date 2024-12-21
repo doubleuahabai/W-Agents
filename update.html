@@ -182,6 +182,7 @@
         const loading = document.getElementById('loading');
         const popupContainer = document.getElementById('popup-container');
         const messageContent = document.getElementById('message-content');
+        let buttons = [];
 
         const urlParams = new URLSearchParams(window.location.search);
         const adminId = urlParams.get('adminId') || null;
@@ -211,21 +212,84 @@
                 });
 
                 const traces = await response.json();
-                displayMessage(traces);
+                return processTraces(traces);
             } catch (error) {
                 console.error('Error:', error);
-                displayMessage([{ type: 'text', payload: { message: 'Something went wrong. Please try again.' } }]);
+                displayMessage('Something went wrong. Please try again.');
+                return false;
             }
         }
 
-        function displayMessage(traces) {
+        function processTraces(traces) {
+            let isRunning = true;
+            let message = '';
+            buttons = [];
+
             for (const trace of traces) {
-                if (trace.type === 'text') {
-                    messageContent.textContent = trace.payload.message;
-                    showPopup();
+                switch(trace.type) {
+                    case 'text':
+                        message += trace.payload.message + '\n';
+                        break;
+                    case 'choice':
+                        buttons = trace.payload.buttons;
+                        message += '\nOptions:\n';
+                        buttons.forEach((button, index) => {
+                            message += `${index + 1}. ${button.name}\n`;
+                        });
+                        break;
+                    case 'end':
+                        isRunning = false;
+                        break;
+                    default:
+                        console.log('Unhandled trace type:', trace.type);
                 }
             }
+
+            displayMessage(message.trim());
+            if (buttons.length > 0) {
+                addButtonsToUI();
+            }
+            return isRunning;
+        }
+
+        function displayMessage(message) {
+            messageContent.innerHTML = message.replace(/\n/g, '<br>');
             loading.style.display = 'none';
+            showPopup();
+        }
+
+        function addButtonsToUI() {
+            const buttonContainer = document.createElement('div');
+            buttonContainer.style.cssText = `
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                justify-content: center;
+                margin-top: 15px;
+            `;
+
+            buttons.forEach((button, index) => {
+                const btn = document.createElement('button');
+                btn.textContent = button.name;
+                btn.style.cssText = `
+                    padding: 8px 16px;
+                    border: none;
+                    border-radius: 5px;
+                    background: #e4a853;
+                    color: #fff;
+                    cursor: pointer;
+                    transition: background 0.3s;
+                `;
+                btn.onclick = () => handleButtonClick(button.request);
+                buttonContainer.appendChild(btn);
+            });
+
+            messageContent.appendChild(buttonContainer);
+        }
+
+        async function handleButtonClick(request) {
+            loading.style.display = 'flex';
+            await interactWithVoiceflow(request);
         }
 
         function showPopup() {
