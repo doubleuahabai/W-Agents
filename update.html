@@ -191,15 +191,43 @@
         };
 
         /**
+         * Retry logic wrapper for async operations
+         * @param {() => Promise<T>} operation - The operation to retry
+         * @param {number} [maxAttempts=3] - Maximum retry attempts
+         * @param {number} [delayMs=1000] - Delay between retries (in milliseconds)
+         * @returns {Promise<T>} - Resolves to the operation's result or throws an error after retries
+         */
+        async function withRetry(operation, maxAttempts = 3, delayMs = 1000) {
+            let lastError;
+
+            for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+                try {
+                    return await operation();
+                } catch (error) {
+                    lastError = error instanceof Error ? error : new Error(String(error));
+
+                    if (attempt === maxAttempts) {
+                        throw lastError;
+                    }
+
+                    console.warn(`Attempt ${attempt} failed, retrying in ${delayMs}ms...`);
+                    await new Promise(resolve => setTimeout(resolve, delayMs));
+                }
+            }
+
+            throw lastError;
+        }
+
+        /**
          * Makes an API request to interact with Voiceflow
          * @param {string} userId - User ID for Voiceflow interaction
          * @param {object} request - Request payload for Voiceflow
          */
         const interactWithVoiceflow = async (userId, request) => {
-            try {
+            return withRetry(async () => {
                 const response = await axios.post(
                     `https://general-runtime.voiceflow.com/state/user/${userId}/interact`,
-                    { request: request },
+                    request,
                     {
                         headers: {
                             'Authorization': apiKey,
@@ -211,31 +239,23 @@
                 );
 
                 const traces = response.data;
-                processTraces(traces);
-            } catch (error) {
-                console.error('Error interacting with Voiceflow:', error);
-                displayErrorMessage('Something went wrong. Please try again later.');
-            }
-        };
 
-        /**
-         * Processes the API response traces
-         * @param {Array} traces - Array of trace objects from the Voiceflow response
-         */
-        const processTraces = (traces) => {
-            if (!traces || traces.length === 0) {
-                displayErrorMessage('No response from Mylo. Please try again later.');
-                return;
-            }
-
-            for (const trace of traces) {
-                if (trace.type === 'text') {
-                    displayMessage(trace.payload.message);
-                    return; // Exit once a valid message is found
+                // Using a for loop to iterate and print text traces
+                let foundMessage = false;
+                for (let trace of traces) {
+                    if (trace.type === 'text') {
+                        console.log(trace.payload.message); // Log each text trace message
+                        if (!foundMessage) {
+                            displayMessage(trace.payload.message);
+                            foundMessage = true; // Ensure the first valid text is displayed
+                        }
+                    }
                 }
-            }
 
-            displayErrorMessage('Unexpected response format. Please try again.');
+                if (!foundMessage) {
+                    displayErrorMessage('No valid text response found.');
+                }
+            });
         };
 
         /**
@@ -260,7 +280,10 @@
 
         // Initiate interaction on window load
         window.onload = () => {
-            interactWithVoiceflow(adminId, requestPayload);
+            interactWithVoiceflow(adminId, requestPayload).catch(error => {
+                console.error('Failed to interact with Voiceflow:', error);
+                displayErrorMessage('Unable to fetch response. Please try again later.');
+            });
         };
     </script>
 </body>
