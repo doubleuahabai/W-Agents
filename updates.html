@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Message from Mylo</title>
     <style>
-        /* General Reset */
+       /* General Reset */
         body {
             margin: 0;
             padding: 0;
@@ -15,7 +15,7 @@
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            overflow: hidden;
+            overflow: hidden; /* Optional, can be toggled based on popups */
             position: relative;
         }
 
@@ -36,6 +36,32 @@
         @keyframes rotateLogo {
             0% { transform: translate(-50%, -50%) rotate(0deg); }
             100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* Email Request Popup Styles */
+        .email-input {
+            padding: 10px;
+            margin-top: 10px;
+            width: 80%;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .popup button {
+            margin-top: 10px;
+            padding: 12px 20px; /* Adjust padding for button consistency */
+            font-size: 16px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .popup button:hover {
+            background-color: #0056b3;
         }
 
         /* Message Container */
@@ -73,8 +99,8 @@
             gap: 20px;
             animation: scaleIn 0.6s ease-out;
             position: relative;
-            max-width: 400px;
-            width: 90%;
+            max-width: 90%;
+            width: 500px;
         }
 
         @keyframes scaleIn {
@@ -110,6 +136,7 @@
             box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.3);
             backdrop-filter: blur(5px);
             word-wrap: break-word;
+            max-width: 90%;
         }
 
         /* Close Button */
@@ -162,44 +189,71 @@
 <body>
     <div class="logo-background"></div>
 
-    <div id="popup-container" class="popup-container">
-    <div class="popup">
-        <div class="close-btn" onclick="hidePopup()">✖</div>
-        <div class="avatar"></div>
-        <div class="name">Mylo</div>
-        <div class="message" id="message-content">Fetching Update</div>
-        <div id="loading" class="loading" style="display: none;">Loading...</div> <!-- Optional loading message -->
+    <!-- Email Request Popup -->
+    <div id="email-popup-container" class="popup-container" style="display: none;">
+        <div class="popup">
+            <div class="close-btn" onclick="hideEmailPopup()">✖</div>
+            <div class="message">Please enter your email address:</div>
+            <input type="email" id="email-input" placeholder="Enter your email" class="email-input">
+            <button onclick="submitEmail()">Submit</button>
+        </div>
     </div>
-</div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const apiKey = 'VF.DM.676fe73a08b5445136540d95.EVe0gNRRIYEB0qpY'; // Replace with your actual Voiceflow API Key
-        const userId = 'test_user'; // Dynamically set for user-specific sessions
-        const popupContainer = document.getElementById('popup-container');
-        const messageContent = document.getElementById('message-content');
-        const loadingIndicator = document.getElementById('loading');
+    <!-- Original Popup (Mylo) -->
+    <div id="popup-container" class="popup-container" style="display: none;">
+        <div class="popup">
+            <div class="close-btn" onclick="hidePopup()">✖</div>
+            <div class="avatar"></div>
+            <div class="name">Mylo</div>
+            <div class="message" id="message-content">Hold on a sec...</div>
+            <div id="loading" class="loading" style="display: none;">Loading...</div> <!-- Optional loading message -->
+        </div>
+    </div>
 
-        // Hide popup function
-        window.hidePopup = () => {
-            popupContainer.style.display = 'none';
-        };
+    <script>
+        let userId = ''; // This will hold the email as userId
 
-        // Show loading animation
-        const showLoading = () => {
+        // Show the email popup when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('email-popup-container').style.display = 'block';
+        });
+
+        // Hide the email popup
+        function hideEmailPopup() {
+            document.getElementById('email-popup-container').style.display = 'none';
+        }
+
+        // Show the loading state in the original popup
+        function showLoading() {
+            const loadingIndicator = document.getElementById('loading');
             loadingIndicator.style.display = 'block';
-            messageContent.textContent = 'Please wait...';
-            popupContainer.style.display = 'none'; // Optional, depending on how you want it to look
-        };
+            document.getElementById('popup-container').style.display = 'none';
+        }
 
-        // Hide loading animation
-        const hideLoading = () => {
+        // Hide the loading state in the original popup
+        function hideLoading() {
+            const loadingIndicator = document.getElementById('loading');
             loadingIndicator.style.display = 'none';
-            popupContainer.style.display = 'block';
-        };
+            document.getElementById('popup-container').style.display = 'block';
+        }
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const action = urlParams.get('adminId') || 'auto_update_user';
+        // Email validation regex
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+        // Submit email and validate it
+        function submitEmail() {
+            const emailInput = document.getElementById('email-input');
+            const email = emailInput.value.trim();
+
+            // Check if email is valid
+            if (emailRegex.test(email)) {
+                userId = email; // Set the email as userId
+                hideEmailPopup(); // Hide the email popup
+                initiateVoiceflowCall(); // Proceed with the API call
+            } else {
+                alert('Please enter a valid email address.');
+            }
+        }
 
         // Fetch Voiceflow response and update the UI
         const initiateVoiceflowCall = async () => {
@@ -210,18 +264,17 @@
                     {
                         method: 'POST',
                         headers: {
-                            'Authorization': apiKey,
+                            'Authorization': 'VF.DM.6758c6fb968873b627e0b5db.Cc5NcWBtBhx987kx', // Replace with your actual Voiceflow API Key
                             'Content-Type': 'application/json',
                             'Accept': 'application/json',
                             'versionID': 'production',
                         },
                         body: JSON.stringify({
                             request: {
-                                type: 'event',
+                                type: 'launch',
                                 payload: {
                                     event: {
-                                        name: 'admin',
-                                        action: action
+                                        name: 'button_clicked' // Your event name
                                     }
                                 }
                             }
@@ -237,24 +290,22 @@
                 const textTrace = data.find(trace => trace.type === 'text');
 
                 if (textTrace) {
-                    messageContent.textContent = textTrace.payload.message;
+                    document.getElementById('message-content').textContent = textTrace.payload.message;
                 } else {
-                    messageContent.textContent = 'No message received from Mylo. Please try again.';
+                    document.getElementById('message-content').textContent = 'No message received from Mylo. Please try again.';
                 }
             } catch (error) {
                 console.error('Error interacting with Voiceflow:', error);
-                messageContent.textContent = 'Something went wrong. Please try again later.';
+                document.getElementById('message-content').textContent = 'Something went wrong. Please try again later.';
             } finally {
                 hideLoading();
             }
         };
 
-        // Automatically call the API when the popup is loaded
-        initiateVoiceflowCall();
-
-        // Open the popup initially
-        popupContainer.style.display = 'block';
-    });
-</script>
+        // Close the main popup
+        function hidePopup() {
+            document.getElementById('popup-container').style.display = 'none';
+        }
+    </script>
 </body>
 </html>
