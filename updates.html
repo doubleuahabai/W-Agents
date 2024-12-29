@@ -255,6 +255,9 @@
             }
         }
 
+        const urlParams = new URLSearchParams(window.location.search);
+        const action = urlParams.get('adminId') || 'auto_update_user';
+
         // Fetch Voiceflow response and update the UI
         const initiateVoiceflowCall = async () => {
             showLoading();
@@ -274,7 +277,7 @@
                                 type: 'launch',
                                 payload: {
                                     event: {
-                                        name: 'button_clicked' // Your event name
+                                        name: action // Your event name
                                     }
                                 }
                             }
