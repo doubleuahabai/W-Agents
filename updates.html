@@ -108,24 +108,6 @@
             100% { transform: scale(1); opacity: 1; }
         }
 
-        .image-container {
-            max-width: 100%; /* Prevent overflow */
-            max-height: 200px; /* Set a height limit */
-            overflow: hidden;
-            margin: 10px 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .image-container img {
-            max-width: 100%;
-            max-height: 100%;
-            border-radius: 10px; /* Optional: rounded corners */
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Optional: shadow for style */
-        }
-
-
         /* Avatar */
         .avatar {
             width: clamp(80px, 15vw, 120px);
@@ -224,61 +206,59 @@
             <div class="avatar"></div>
             <div class="name">Mylo</div>
             <div class="message" id="message-content">Hold on a sec...</div>
-            <div class="image-container" id="image-content" style="display: none;"></div>
-            <div id="loading" class="loading" style="display: none;">Loading...</div>
+            <div id="loading" class="loading" style="display: none;">Loading...</div> <!-- Optional loading message -->
         </div>
     </div>
 
-
     <script>
         let userId = ''; // This will hold the email as userId
+            
+            // Show the email popup when the page loads
+            document.addEventListener('DOMContentLoaded', () => {
+                    document.getElementById('email-popup-container').style.display = 'block';
+                });
 
-        // Show the email popup when the page loads
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('email-popup-container').style.display = 'block';
-        });
+                // Hide the email popup
+                function hideEmailPopup() {
+                    document.getElementById('email-popup-container').style.display = 'none';
+                }
 
-        // Hide the email popup
-        function hideEmailPopup() {
-            document.getElementById('email-popup-container').style.display = 'none';
-        }
+                // Show the loading state in the original popup
+                function showLoading() {
+                    const loadingIndicator = document.getElementById('loading');
+                    loadingIndicator.style.display = 'block';
+                    document.getElementById('popup-container').style.display = 'none';
+                }
 
-        // Show the loading state in the original popup
-        function showLoading() {
-            const loadingIndicator = document.getElementById('loading');
-            loadingIndicator.style.display = 'block';
-            document.getElementById('popup-container').style.display = 'none';
-        }
+                // Hide the loading state in the original popup
+                function hideLoading() {
+                    const loadingIndicator = document.getElementById('loading');
+                    loadingIndicator.style.display = 'none';
+                    document.getElementById('popup-container').style.display = 'block';
+                }
 
-        // Hide the loading state in the original popup
-        function hideLoading() {
-            const loadingIndicator = document.getElementById('loading');
-            loadingIndicator.style.display = 'none';
-            document.getElementById('popup-container').style.display = 'block';
-        }
+                // Email validation regex
+                const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-        // Email validation regex
-        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                // Submit email and validate it
+                function submitEmail() {
+                    const emailInput = document.getElementById('email-input');
+                    const email = emailInput.value.trim();
 
-        // Submit email and validate it
-        function submitEmail() {
-            const emailInput = document.getElementById('email-input');
-            const email = emailInput.value.trim();
+                    // Check if email is valid
+                    if (emailRegex.test(email)) {
+                        userId = email; // Set the email as userId
+                        hideEmailPopup(); // Hide the email popup
+                        initiateVoiceflowCall(); // Proceed with the API call
+                    } else {
+                        alert('Please enter a valid email address.');
+                    }
+                }
 
-            // Check if email is valid
-            if (emailRegex.test(email)) {
-                userId = email; // Set the email as userId
-                hideEmailPopup(); // Hide the email popup
-                initiateVoiceflowCall(); // Proceed with the API call
-            } else {
-                alert('Please enter a valid email address.');
-            }
-        }
+                const urlParams = new URLSearchParams(window.location.search);
+                const action = urlParams.get('adminId') || 'auto_update_user';
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const action = urlParams.get('adminId') || 'auto_update_user';
-
-        // Fetch Voiceflow response and update the UI
+                // Fetch Voiceflow response and update the UI
         const initiateVoiceflowCall = async () => {
             showLoading();
             try {
@@ -297,10 +277,10 @@
                                 type: 'launch',
                                 payload: {
                                     event: {
-                                        name: action // Your event name
-                                    }
-                                }
-                            }
+                                        name: action, // Your event name
+                                    },
+                                },
+                            },
                         }),
                     }
                 );
@@ -310,7 +290,31 @@
                 }
 
                 const data = await response.json();
-                handleVoiceflowResponse(data); // Use the response handler for processing
+
+                for (let trace of data) {
+                    if (trace.type === 'text') {
+                        const messageContent = document.getElementById('message-content');
+                        messageContent.textContent = trace.payload.message || 'No message received from Mylo. Please try again.';
+                    } else if (trace.type === 'choice') {
+                        buttons = trace.payload.buttons;
+                    } else if (trace.type === 'visual') {
+                        const { image, dimensions } = trace.payload;
+
+                        const imgElement = document.createElement('img');
+                        imgElement.src = image;
+                        imgElement.alt = "Response image";
+
+                        if (dimensions) {
+                            imgElement.style.width = dimensions.width > 800 ? "100%" : `${dimensions.width}px`;
+                            imgElement.style.height = dimensions.height > 800 ? "auto" : `${dimensions.height}px`;
+                        }
+
+                        const imageContent = document.getElementById('image-content');
+                        imageContent.innerHTML = ''; // Clear previous image if any
+                        imageContent.appendChild(imgElement);
+                        imageContent.style.display = "block";
+                    }
+                }
 
             } catch (error) {
                 console.error('Error interacting with Voiceflow:', error);
@@ -320,53 +324,10 @@
             }
         };
 
-        // Process Voiceflow response to handle text and images
-        function handleVoiceflowResponse(data) {
-            const messageContent = document.getElementById('message-content');
-            const imageContent = document.getElementById('image-content');
-
-            const textTrace = data.find(trace => trace.type === 'text');
-            const visualTrace = data.find(trace => trace.type === 'visual' && trace.payload.visualType === 'image');
-
-            // Handle text message
-            if (textTrace) {
-                messageContent.textContent = textTrace.payload.message;
-            } else {
-                messageContent.textContent = 'No message received from Mylo. Please try again.';
-            }
-
-            // Handle image trace
-            if (visualTrace) {
-                const { image, dimensions } = visualTrace.payload;
-
-                // Create an img element and set the src
-                const imgElement = document.createElement('img');
-                imgElement.src = image;
-                imgElement.alt = "Response image";
-
-                // Optionally adjust dimensions or styles dynamically
-                if (dimensions) {
-                    imgElement.style.width = dimensions.width > 800 ? "100%" : `${dimensions.width}px`;
-                    imgElement.style.height = dimensions.height > 800 ? "auto" : `${dimensions.height}px`;
-                }
-
-                // Append the image to the container
-                imageContent.innerHTML = ''; // Clear previous image if any
-                imageContent.appendChild(imgElement);
-
-                // Show the image container
-                imageContent.style.display = "block";
-            } else {
-                // Hide the image container if no image is present
-                imageContent.style.display = "none";
-            }
-        }
-
         // Close the main popup
         function hidePopup() {
             document.getElementById('popup-container').style.display = 'none';
         }
     </script>
-
 </body>
 </html>
