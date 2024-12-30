@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Message from Mylo</title>
+    <title>The Show Originals</title>
     <style>
-       /* General Reset */
+        /* General Reset */
         body {
             margin: 0;
             padding: 0;
@@ -204,9 +204,10 @@
         <div class="popup">
             <div class="close-btn" onclick="hidePopup()">✖</div>
             <div class="avatar"></div>
-            <div class="name">Mylo</div>
+            <div class="name">The Show Originals</div>
             <div class="message" id="message-content">Hold on a sec...</div>
-            <div id="loading" class="loading" style="display: none;">Loading...</div> <!-- Optional loading message -->
+            <div class="image-container" id="image-content" style="display: none;"></div>
+            <div id="loading" class="loading" style="display: none;">Loading...</div>
         </div>
     </div>
 
@@ -295,19 +296,12 @@
                     if (trace.type === 'text') {
                         const messageContent = document.getElementById('message-content');
                         messageContent.textContent = trace.payload.message || 'No message received from Mylo. Please try again.';
-                    } else if (trace.type === 'choice') {
-                        buttons = trace.payload.buttons;
                     } else if (trace.type === 'visual') {
-                        const { image, dimensions } = trace.payload;
+                        const { image } = trace.payload;
 
                         const imgElement = document.createElement('img');
                         imgElement.src = image;
                         imgElement.alt = "Response image";
-
-                        if (dimensions) {
-                            imgElement.style.width = dimensions.width > 800 ? "100%" : `${dimensions.width}px`;
-                            imgElement.style.height = dimensions.height > 800 ? "auto" : `${dimensions.height}px`;
-                        }
 
                         const imageContent = document.getElementById('image-content');
                         imageContent.innerHTML = ''; // Clear previous image if any
