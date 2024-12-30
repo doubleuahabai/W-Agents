@@ -108,6 +108,24 @@
             100% { transform: scale(1); opacity: 1; }
         }
 
+        .image-container {
+            max-width: 100%; /* Prevent overflow */
+            max-height: 200px; /* Set a height limit */
+            overflow: hidden;
+            margin: 10px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 10px; /* Optional: rounded corners */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Optional: shadow for style */
+        }
+
+
         /* Avatar */
         .avatar {
             width: clamp(80px, 15vw, 120px);
@@ -206,9 +224,11 @@
             <div class="avatar"></div>
             <div class="name">Mylo</div>
             <div class="message" id="message-content">Hold on a sec...</div>
-            <div id="loading" class="loading" style="display: none;">Loading...</div> <!-- Optional loading message -->
+            <div class="image-container" id="image-content" style="display: none;"></div>
+            <div id="loading" class="loading" style="display: none;">Loading...</div>
         </div>
     </div>
+
 
     <script>
         let userId = ''; // This will hold the email as userId
@@ -290,13 +310,8 @@
                 }
 
                 const data = await response.json();
-                const textTrace = data.find(trace => trace.type === 'text');
+                handleVoiceflowResponse(data); // Use the response handler for processing
 
-                if (textTrace) {
-                    document.getElementById('message-content').textContent = textTrace.payload.message;
-                } else {
-                    document.getElementById('message-content').textContent = 'No message received from Mylo. Please try again.';
-                }
             } catch (error) {
                 console.error('Error interacting with Voiceflow:', error);
                 document.getElementById('message-content').textContent = 'Something went wrong. Please try again later.';
@@ -305,10 +320,53 @@
             }
         };
 
+        // Process Voiceflow response to handle text and images
+        function handleVoiceflowResponse(data) {
+            const messageContent = document.getElementById('message-content');
+            const imageContent = document.getElementById('image-content');
+
+            const textTrace = data.find(trace => trace.type === 'text');
+            const visualTrace = data.find(trace => trace.type === 'visual' && trace.payload.visualType === 'image');
+
+            // Handle text message
+            if (textTrace) {
+                messageContent.textContent = textTrace.payload.message;
+            } else {
+                messageContent.textContent = 'No message received from Mylo. Please try again.';
+            }
+
+            // Handle image trace
+            if (visualTrace) {
+                const { image, dimensions } = visualTrace.payload;
+
+                // Create an img element and set the src
+                const imgElement = document.createElement('img');
+                imgElement.src = image;
+                imgElement.alt = "Response image";
+
+                // Optionally adjust dimensions or styles dynamically
+                if (dimensions) {
+                    imgElement.style.width = dimensions.width > 800 ? "100%" : `${dimensions.width}px`;
+                    imgElement.style.height = dimensions.height > 800 ? "auto" : `${dimensions.height}px`;
+                }
+
+                // Append the image to the container
+                imageContent.innerHTML = ''; // Clear previous image if any
+                imageContent.appendChild(imgElement);
+
+                // Show the image container
+                imageContent.style.display = "block";
+            } else {
+                // Hide the image container if no image is present
+                imageContent.style.display = "none";
+            }
+        }
+
         // Close the main popup
         function hidePopup() {
             document.getElementById('popup-container').style.display = 'none';
         }
     </script>
+
 </body>
 </html>
