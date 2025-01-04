@@ -342,38 +342,42 @@
                     messageContent.textContent = trace.payload.message || 'No message received from Mylo. Please try again.';
                 } else if (trace.type === 'visual') {
                     const { image } = trace.payload;
-
+            
                     const imgElement = document.createElement('img');
                     imgElement.src = image;
                     imgElement.alt = "Response image";
-
+            
                     const imageContent = document.getElementById('image-content');
                     imageContent.innerHTML = ''; // Clear previous image if any
                     imageContent.appendChild(imgElement);
                     imageContent.style.display = "block";
                 } else if (trace.type === 'choice') {
                     const { buttons } = trace.payload;
-
+            
                     const buttonContainer = document.getElementById('button-container');
                     buttonContainer.innerHTML = ''; // Clear previous buttons if any
-
+            
                     for (let button of buttons) {
                         const buttonElement = document.createElement('button');
                         buttonElement.textContent = button.name;
                         buttonElement.className = 'response-button'; // Add a class for styling
+            
+                        // Open the URL in the same page when the button is clicked
                         buttonElement.onclick = () => {
-                            if (button.request && button.request.payload.query) {
-                                window.location.href = button.request.payload.query; // Redirect to URL or handle intent
+                            if (button.request?.payload?.url) {
+                                window.location.href = button.request.payload.url; // Redirect to the URL in the same page
+                            } else {
+                                console.warn("No valid URL found in the button payload.");
                             }
                         };
-
+            
                         buttonContainer.appendChild(buttonElement);
                     }
-
+            
                     buttonContainer.style.display = 'flex'; // Show the button container
                 }
             }
-
+                
             } catch (error) {
                 console.error('Error interacting with Voiceflow:', error);
                 document.getElementById('message-content').textContent = 'Something went wrong. Please try again later.';
