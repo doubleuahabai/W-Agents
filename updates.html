@@ -202,6 +202,27 @@
             animation: spin 1s linear infinite;
         }
 
+        #button-container {
+            display: none; /* Hidden by default, shown only when buttons are added */
+            margin-top: 20px;
+            justify-content: center;
+            gap: 10px; /* Space between buttons */
+        }
+
+        .response-button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .response-button:hover {
+            background-color: #0056b3;
+        }
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -229,6 +250,7 @@
             <div class="name">The Show Originals</div>
             <div class="message" id="message-content">Hold on a sec...</div>
             <div class="image-container" id="image-content" style="display: none;"></div>
+            <div id="button-container" style="display: none;"></div>
             <div id="loading" class="loading" style="display: none;">Loading...</div>
         </div>
     </div>
@@ -290,7 +312,7 @@
                     {
                         method: 'POST',
                         headers: {
-                            'Authorization': 'VF.DM.67725e1509e83f2e9815d353.2rsyviPzs0fe8ZPQ', // Replace with your actual Voiceflow API Key
+                            'Authorization': 'VF.DM.6779ae4809e83f2e9815d451.Vbcl9999zkfizxtk', // Replace with your actual Voiceflow API Key
                             'Content-Type': 'application/json',
                             'Accept': 'application/json',
                             'versionID': 'production',
@@ -315,22 +337,42 @@
                 const data = await response.json();
 
                 for (let trace of data) {
-                    if (trace.type === 'text') {
-                        const messageContent = document.getElementById('message-content');
-                        messageContent.textContent = trace.payload.message || 'No message received from Mylo. Please try again.';
-                    } else if (trace.type === 'visual') {
-                        const { image } = trace.payload;
+                if (trace.type === 'text') {
+                    const messageContent = document.getElementById('message-content');
+                    messageContent.textContent = trace.payload.message || 'No message received from Mylo. Please try again.';
+                } else if (trace.type === 'visual') {
+                    const { image } = trace.payload;
 
-                        const imgElement = document.createElement('img');
-                        imgElement.src = image;
-                        imgElement.alt = "Response image";
+                    const imgElement = document.createElement('img');
+                    imgElement.src = image;
+                    imgElement.alt = "Response image";
 
-                        const imageContent = document.getElementById('image-content');
-                        imageContent.innerHTML = ''; // Clear previous image if any
-                        imageContent.appendChild(imgElement);
-                        imageContent.style.display = "block";
+                    const imageContent = document.getElementById('image-content');
+                    imageContent.innerHTML = ''; // Clear previous image if any
+                    imageContent.appendChild(imgElement);
+                    imageContent.style.display = "block";
+                } else if (trace.type === 'choice') {
+                    const { buttons } = trace.payload;
+
+                    const buttonContainer = document.getElementById('button-container');
+                    buttonContainer.innerHTML = ''; // Clear previous buttons if any
+
+                    for (let button of buttons) {
+                        const buttonElement = document.createElement('button');
+                        buttonElement.textContent = button.name;
+                        buttonElement.className = 'response-button'; // Add a class for styling
+                        buttonElement.onclick = () => {
+                            if (button.request && button.request.payload.query) {
+                                window.location.href = button.request.payload.query; // Redirect to URL or handle intent
+                            }
+                        };
+
+                        buttonContainer.appendChild(buttonElement);
                     }
+
+                    buttonContainer.style.display = 'flex'; // Show the button container
                 }
+            }
 
             } catch (error) {
                 console.error('Error interacting with Voiceflow:', error);
