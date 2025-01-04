@@ -362,12 +362,17 @@
                         buttonElement.textContent = button.name;
                         buttonElement.className = 'response-button'; // Add a class for styling
             
-                        // Open the URL in the same page when the button is clicked
+                        // Handle button action
                         buttonElement.onclick = () => {
-                            if (button.request?.payload?.url) {
-                                window.location.href = button.request.payload.url; // Redirect to the URL in the same page
+                            if (button.request?.payload?.actions) {
+                                for (let action of button.request.payload.actions) {
+                                    if (action.type === 'open_url' && action.url) {
+                                        window.location.href = action.url; // Open the URL in the same tab
+                                        return; // Exit loop after the first URL is handled
+                                    }
+                                }
                             } else {
-                                console.warn("No valid URL found in the button payload.");
+                                console.warn("No valid actions found in the button payload.");
                             }
                         };
             
