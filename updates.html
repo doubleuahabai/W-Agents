@@ -366,7 +366,7 @@
                             if (button.request?.payload?.actions) {
                                 for (let action of button.request.payload.actions) {
                                     if (action.type === 'open_url' && action.payload?.url) {
-                                        window.location.href = action.payload.url; // Open the URL in the same tab
+                                        window.location.replace(action.payload.url); // Open the URL in the same tab
                                         return; // Exit loop after the first URL is handled
                                     }
                                 }
