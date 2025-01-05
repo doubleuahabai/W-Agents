@@ -362,19 +362,18 @@
                         buttonElement.textContent = button.name;
                         buttonElement.className = 'response-button'; // Add a class for styling
             
-                        // Handle button action
-                        buttonElement.onclick = () => {
+                        buttonElement.addEventListener('click', () => {
                             if (button.request?.payload?.actions) {
                                 for (let action of button.request.payload.actions) {
-                                    if (action.type === 'open_url' && action.url) {
-                                        window.location.href = action.url; // Open the URL in the same tab
+                                    if (action.type === 'open_url' && action.payload?.url) {
+                                        window.location.href = action.payload.url; // Open the URL in the same tab
                                         return; // Exit loop after the first URL is handled
                                     }
                                 }
                             } else {
                                 console.warn("No valid actions found in the button payload.");
                             }
-                        };
+                        });
             
                         buttonContainer.appendChild(buttonElement);
                     }
