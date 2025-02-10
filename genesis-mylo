@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mylo Virtual Waitress Demo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-brown: #4a2c2a;
+      --secondary-green: #3a5f0b;
+      --accent-beige: #f5e6d3;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      /* Using the imported Orbitron font for that futuristic vibe */
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    body {
+      background-color: var(--primary-brown);
+      overflow-x: hidden;
+    }
+
+    .header {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.9);
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+    }
+
+    .restaurant-logo {
+      height: 50px;
+      max-width: 200px;
+      object-fit: contain;
+    }
+
+    /* Hero Section */
+    .hero {
+      display: flex;
+      width: 100%;
+      height: 100vh;
+    }
+
+    /* Image container */
+    .hero-image {
+      flex: 1;
+      position: relative;
+    }
+
+    .hero-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain; /* Ensures the full image is visible without cropping */
+      display: block;
+    }
+
+    /* Content container */
+    .hero-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      padding: 2rem;
+      text-align: center;
+      background: rgba(0, 0, 0, 0.5);
+    }
+
+    h1 {
+      font-size: clamp(2rem, 6vw, 3.5rem);
+      margin-bottom: 1.5rem;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .subtitle {
+      font-size: clamp(1rem, 3vw, 1.5rem);
+      margin-bottom: 3rem;
+      color: var(--accent-beige);
+    }
+
+    .cta-widget {
+      background: var(--secondary-green);
+      padding: 1rem 1.5rem;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 1rem;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      position: relative;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
+
+    .cta-widget:hover {
+      transform: translateY(-5px);
+    }
+
+    .cta-widget::after {
+      content: '';
+      position: absolute;
+      right: -20px;
+      bottom: -10px;
+      border-width: 15px;
+      border-style: solid;
+      border-color: transparent transparent var(--secondary-green) transparent;
+      transform: rotate(-45deg);
+    }
+
+    .chat-icon {
+      width: 30px;
+      height: 30px;
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>');
+      background-size: contain;
+      background-repeat: no-repeat;
+    }
+
+    .cta-text {
+      color: white;
+      font-size: clamp(1rem, 2.5vw, 1.2rem);
+      font-weight: bold;
+    }
+
+    /* Mobile adjustments */
+    @media (max-width: 768px) {
+      .hero {
+        flex-direction: column;
+        height: auto;
+      }
+
+      /* Let the image take up half of the viewport height on mobile */
+      .hero-image {
+        width: 100%;
+        height: 50vh;
+      }
+
+      .hero-content {
+        width: 100%;
+        padding: 1rem;
+      }
+
+      .cta-widget {
+        padding: 0.8rem 1.2rem;
+      }
+
+      .cta-widget::after {
+        right: -15px;
+        bottom: -8px;
+        border-width: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <img src="https://cm4-production-assets.s3.amazonaws.com/1738314688524-_images_logos_genesis1-ezgif.com-webp-to-png-converter.png" alt="Restaurant Logo" class="restaurant-logo">
+  </header>
+
+  <section class="hero">
+    <div class="hero-image">
+      <img src="https://cm4-production-assets.s3.amazonaws.com/1739195392431-mylodemo1-removebg-preview.png" alt="Mylo Virtual Waitress">
+    </div>
+    <div class="hero-content">
+      <h1>Meet Mylo</h1>
+      <p class="subtitle">Experience seamless ordering with AI-powered hospitality</p>
+      <div class="cta-widget" id="chat-widget">
+        <div class="chat-icon"></div>
+        <span class="cta-text">Order Now</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Chat Agent Widget Script -->
+  <script type="text/javascript">
+    (function(d, t) {
+      var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
+      v.onload = function() {
+        window.voiceflow.chat.load({
+          verify: { projectID: '679c78bbc37a1c1e93062933' },
+          url: 'https://general-runtime.voiceflow.com',
+          versionID: 'production'
+        });
+      };
+      v.src = "https://cdn.voiceflow.com/widget-next/bundle.mjs";
+      v.type = "text/javascript";
+      s.parentNode.insertBefore(v, s);
+    })(document, 'script');
+
+    // Add click event listener to the CTA widget
+    document.getElementById('chat-widget').addEventListener('click', function() {
+      window.voiceflow.chat.open();
+    });
+  </script>
+</body>
+</html>
